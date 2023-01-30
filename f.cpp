@@ -6,19 +6,28 @@ int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    int n, q;
-    cin >> n >> q;
-    int dp[n + 1][5];
-    memset(dp, 0x0, sizeof(dp));
-    for (int i = 1; i <= n; ++i) {
-        for (int j = 1; j <= 3; ++j) {
-            dp[i][j] += dp[i - 1][j];
+    auto checkPerfect = [&](int x) -> bool {
+        int sum = 1;
+        for (int i = 2; i * i <= x; ++i)
+            !(x % i) ? sum += i * i != x ? i + x / i : 0 : 0;
+        return sum == x && x > 1;
+    };
+    auto checkPrime = [&](int x) -> bool {
+        bool flag = true;
+        for (int i = 2; i * i <= x; i = i + (i & 1) + 1) {
+            if (!(x % i)) {
+                flag = false;
+                break;
+            }
         }
-    }
-    for (int i = 1, l, r; i <= n; ++i) {
-        cin >> l >> r;
-        for (int j = 1; j <= 3; ++j) {
-            cout << dp[r - 1][j] - dp[l - 1][j] << (j == 3 ? '\n' : ' ');
-        }
-    }
+        return x > 1 && flag;
+    };
+    auto checkSquare = [&](int x) -> bool {
+        return (1LL) * sqrt(x) * sqrt(x) == x;
+    };
+    int n;
+    cin >> n;
+    cout << (checkPrime(n) ? "YES" : "NO") << '\n';
+    cout << (checkPerfect(n) ? "YES" : "NO") << '\n';
+    cout << (checkSquare(n) ? "YES" : "NO") << '\n';
 }
