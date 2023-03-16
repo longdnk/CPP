@@ -176,6 +176,54 @@ b.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/b.cpp.s
 .PHONY : b.cpp.s
 
+c.obj: c.cpp.obj
+.PHONY : c.obj
+
+# target to build an object file
+c.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/c.cpp.obj
+.PHONY : c.cpp.obj
+
+c.i: c.cpp.i
+.PHONY : c.i
+
+# target to preprocess a source file
+c.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/c.cpp.i
+.PHONY : c.cpp.i
+
+c.s: c.cpp.s
+.PHONY : c.s
+
+# target to generate assembly for a file
+c.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/c.cpp.s
+.PHONY : c.cpp.s
+
+f.obj: f.cpp.obj
+.PHONY : f.obj
+
+# target to build an object file
+f.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/f.cpp.obj
+.PHONY : f.cpp.obj
+
+f.i: f.cpp.i
+.PHONY : f.i
+
+# target to preprocess a source file
+f.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/f.cpp.i
+.PHONY : f.cpp.i
+
+f.s: f.cpp.s
+.PHONY : f.s
+
+# target to generate assembly for a file
+f.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CPP_TEST.dir\build.make CMakeFiles/CPP_TEST.dir/f.cpp.s
+.PHONY : f.cpp.s
+
 header/Student.obj: header/Student.cpp.obj
 .PHONY : header/Student.obj
 
@@ -335,6 +383,12 @@ help:
 	@echo ... b.obj
 	@echo ... b.i
 	@echo ... b.s
+	@echo ... c.obj
+	@echo ... c.i
+	@echo ... c.s
+	@echo ... f.obj
+	@echo ... f.i
+	@echo ... f.s
 	@echo ... header/Student.obj
 	@echo ... header/Student.i
 	@echo ... header/Student.s

@@ -88,6 +88,12 @@
 		<Unit filename="F:/CPP/b.cpp">
 			<Option target="CPP_TEST"/>
 		</Unit>
+		<Unit filename="F:/CPP/c.cpp">
+			<Option target="CPP_TEST"/>
+		</Unit>
+		<Unit filename="F:/CPP/f.cpp">
+			<Option target="CPP_TEST"/>
+		</Unit>
 		<Unit filename="F:/CPP/header/Student.cpp">
 			<Option target="CPP_TEST"/>
 		</Unit>

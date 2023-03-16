@@ -1,90 +1,174 @@
-//
-// Created by longdnk on 1/21/2023.
-//
-#include <bits/stdc++.h>
-#include <ostream>
+#include<bits/stdc++.h>
 
+#define null NULL
 using namespace std;
 
-class ThietBi {
-protected:
-    string ten;
-    string maso;
-    int vitri;
-    bool trangthai;
-public:
-    void chinhTrangThai(bool t) {
-        this->trangthai = t;
-    }
+struct Node {
+    int value;
+    Node *next;
+    Node *prev;
 };
 
-class Den : public ThietBi {
-protected:
-    int doSang;
-};
+void init(Node *&head) {
+    head = null;
+}
 
-class DenChieuSang : public Den {
-};
+Node *createNode(int x) {
+    Node *p = new Node;
+    p->value = x;
+    p->next = p->prev = null;
+    return p;
+}
 
-class DenNgu : public Den {
-protected:
-    string mauSang;
-    int doSang;
-public:
-    DenNgu(const string &mauSang, int doSang) : mauSang(mauSang), doSang(doSang) {}
-
-    DenNgu() {}
-
-    void chonMausang(string mau) {
-        this->mauSang = mau;
+void addFirst(Node *&head, int x) {
+    Node *p = createNode(x);
+    p->next = head;
+    if (head != null) {
+        head->prev = p;
     }
+    head = p;
+}
 
-    void chonDoSang(int ds) {
-        this->doSang = ds;
+void addLast(Node *&head, int x) {
+    Node *p = createNode(x);
+    p->next = null;
+    if (head == null) {
+//		addFirst(head, x)
+        p->prev = null;
+        head = p;
+    } else {
+        Node *last = head;
+        while (last->next != null) {
+            last = last->next;
+        }
+        last->next = p;
+        p->prev = last;
     }
-};
+}
 
-class DieuHoa : public ThietBi {
-protected:
-    int nhietDo;
-    int mucDo;
-    string cheDo;
-public:
-    DieuHoa(int nhietDo, int mucDo, const string &cheDo) : nhietDo(nhietDo), mucDo(mucDo), cheDo(cheDo) {}
-
-    DieuHoa() {}
-
-    void chinhNhietDo(int nhiet) {
-        this->nhietDo = nhiet;
+void addAfter(Node *&head, int v, int x) {
+    Node *q = head;
+    Node *last = head;
+    while (q != null && q->value != v) {
+        q = q->next;
     }
-
-    void chinhCheDo(string c) {
-        this->cheDo = c;
+    while (last->next != null) {
+        last = last->next;
     }
-
-    void chinhMucDo(int m) {
-        this->mucDo = m;
+    if (q != null) {
+        if (q == last) {
+            addLast(head, x);
+        } else {
+            Node *p = createNode(x);
+            p->next = q->next;
+            q->next->prev = p;
+            q->next = p;
+            p->prev = q;
+        }
     }
-};
+}
 
-class TiVi : public ThietBi {
-protected:
-    int amLuong, kenh;
-public:
-    void chinhAmLuong(int amluong) {
-        this->amLuong = amluong;
+void deleteFirst(Node *&head) {
+    if (head != null) {
+        Node *p = head;
+        if (p->next == null) {
+            head = null;
+        } else {
+            head = p->next;
+            p->next->prev = null;
+            p->next = null;
+        }
+        delete p;
     }
+}
 
-    void chinhKeng(int k) {
-        this->kenh = k;
+void deleteLast(Node *&head) {
+    if (head != null) {
+        Node *prev = null;
+        Node *last = head;
+        if (last->next == null) {
+            head = null;
+        } else {
+            while (last->next != null) {
+                prev = last;
+                last = last->next;
+            }
+            prev->next = null;
+            delete last;
+        }
     }
-};
+}
+
+void deleteNode(Node *&head, int v) {
+    if (head != null) {
+        Node *prev = null;
+        Node *p = head;
+        if (p->next == null) {
+            head = null;
+        } else {
+            while (p != null && p->value != v) {
+                prev = p;
+                p = p->next;
+            }
+            if (p != null) {
+                if (prev == null) {
+                    deleteFirst(head);
+                } else {
+//					cout << prev->value << ' ' << p->next->value << '\n';
+                    if (p->next == null) {
+                        deleteLast(head);
+                    } else {
+                        prev->next = p->next;
+                        p->next->prev = prev;
+                        p->next = null;
+                        delete p;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void output(Node *head) {
+    while (head != null) {
+        cout << head->value << ' ';
+        head = head->next;
+    }
+    cout << '\n';
+}
+
+void printLast(Node *head) {
+    if (head != null) {
+        Node *last = head;
+        while (last->next != null) {
+            last = last->next;
+        }
+        while (last != null) {
+            cout << last->value << ' ';
+            last = last->prev;
+        }
+        cout << '\n';
+    }
+}
 
 int32_t main() {
-    ThietBi *TB[10];
-    TB[0] = new DenNgu("Xanh La", 20);
-    TB[1] = new DieuHoa(15, 20, "Lanh Nhu Bac Cuc");
-    for (int i = 0; i < 2; ++i) {
-        TB[i]->chinhTrangThai(true);
-    }
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    Node *head;
+    init(head);
+//	addFirst(head, 10);
+//	addFirst(head, 20);
+//	addFirst(head, 30);
+    addLast(head, 10);
+    addLast(head, 20);
+    addLast(head, 30);
+    addLast(head, 40);
+    addLast(head, 50);
+    addAfter(head, 10, 60);
+//	output(head);
+    printLast(head);
+    deleteNode(head, 60);
+//	output(head);
+    printLast(head);
 }
