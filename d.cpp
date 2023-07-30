@@ -1,80 +1,187 @@
 #include "bits/stdc++.h"
 
 using namespace std;
-const int maxn = 1e6 + 9;
-int f[maxn];
-vector<int64_t> p;
-bitset<maxn> isPrime;
-vector<int> prime;
+struct Node {
+    int value;
+    Node *next;
+};
+
+bool isEmpty(Node *head) {
+    return head == nullptr;
+}
+
+void sortList(Node *&head) {
+    if (!isEmpty(head)) {
+        Node *currentNode = head;
+        Node *nextNode;
+        while (currentNode != nullptr) {
+            nextNode = currentNode->next;
+            while (nextNode != nullptr) {
+                if (currentNode->value > nextNode->value) {
+                    int tmp = currentNode->value;
+                    currentNode->value = nextNode->value;
+                    nextNode->value = tmp;
+                }
+                nextNode = nextNode->next;
+            }
+            currentNode = currentNode->next;
+        }
+    }
+}
+
+Node *split(Node *head) {
+    Node *first = head;
+    Node *second = head;
+    while (first->next != nullptr && first->next->next != nullptr) {
+        first = first->next->next;
+        second = second->next;
+    }
+    Node *tmp = second->next;
+    second->next = nullptr;
+    return tmp;
+}
+
+Node *mergeList(Node *first, Node *second) {
+    if (!first) {
+        return second;
+    }
+    if (!second) {
+        return first;
+    }
+    if (first->value < second->value) {
+        first->next = mergeList(first->next, second);
+        return first;
+    }
+    else {
+        second->next = mergeList(first, second->next);
+        return second;
+    }
+}
+
+Node *mergeSort(Node *&head) {
+    if (head == nullptr || head->next == nullptr) {
+        return head;
+    }
+    Node *second = split(head);
+    head = mergeSort(head);
+    second = mergeSort(second);
+    return mergeList(head, second);
+}
+
+Node *createNode(int x) {
+    Node *p = new Node;
+    p->value = x;
+    p->next = nullptr;
+    return p;
+}
+
+void addLast(Node *&head, int k) {
+    Node *p = createNode(k);
+    if (isEmpty(head)) {
+        head = p;
+    }
+    else {
+        Node *last = head;
+        while (last->next != nullptr) {
+            last = last->next;
+        }
+        last->next = p;
+    }
+}
+
+void output(Node *head) {
+    while (!isEmpty(head)) {
+        cout << head->value << ' ';
+        head = head->next;
+    }
+    cout << '\n';
+}
+
+int getMax(int a, int b) {
+    return a > b ? a : b;
+}
+
+int findMaxBelow(Node *head, int x) {
+    int res = -1e9;
+    while (!isEmpty(head)) {
+        if (head->value < x) {
+            res = getMax(res, head->value);
+        }
+        head = head->next;
+    }
+    return res;
+}
+
+int getMin(int a, int b) {
+    return a < b ? a : b;
+}
+
+int findMinAbove(Node *head, int x) {
+    int res = 1e9;
+    while (!isEmpty(head)) {
+        if (head->value > x) {
+            res = min(res, head->value);
+        }
+        head = head->next;
+    }
+    return res;
+}
+
+bool deleteNode(Node *head, int x) {
+    if (!isEmpty(head)) {
+        Node *p = head;
+        Node *prev = nullptr;
+        while (p != nullptr && p->value != x) {
+            prev = p;
+            p = p->next;
+        }
+        if (p != nullptr) {
+            if (prev == nullptr) {
+                Node *tmp = head;
+                head = tmp->next;
+                tmp->next = nullptr;
+                delete tmp;
+            }
+            else {
+                prev->next = p->next;
+                p->next = nullptr;
+                delete p;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+bool isExist(Node *head, int value) {
+    while (!isEmpty(head)) {
+        if (head->value == value) {
+            return true;
+        }
+        head = head->next;
+    }
+    return false;
+}
+
+void removeNodeHaveK(Node *&head, int k) {
+    while (isExist(head, k)) {
+        deleteNode(head, k);
+    }
+}
 
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-
-    isPrime[2] = true;
-    prime.assign(1, 2);
-
-    int sqrtN = (int) sqrt(1e6);
-    for (int i = 3; i <= 1e6; i += 2) {
-        isPrime.set(i);
-    }
-
-    for (int i = 3; i <= 1e6; i += 2) {
-        if (isPrime[i]) {
-            prime.emplace_back(i);
-            if (i > sqrtN) {
-                continue;
-            }
-            for (int j = i * i; j <= 1e6; j += i << 1) {
-                isPrime.reset(j);
-            }
-        }
-    }
-
-    for (auto item : prime) {
-        if (item != 3) {
-            p.emplace_back(1LL * item * item * 9);
-        }
-    }
-
-    auto findFi = [&](int64_t x) -> int {
-        int l = 0, r = (int) p.size(), mid, res = -1;
-        while (l <= r) {
-            mid = (r + l) >> 1;
-            if (p[mid] <= x) {
-                res = mid;
-                l = mid + 1;
-            }
-            else {
-                r = mid - 1;
-            }
-        }
-        return res;
-    };
-
-    auto findSe = [&](int64_t x) -> int {
-        int l = 0, r = (int) p.size(), mid, res = -1;
-        while (l <= r) {
-            mid = (r + l) >> 1;
-            if (p[mid] >= x) {
-                res = mid;
-                r = mid - 1;
-            }
-            else {
-                l = mid + 1;
-            }
-        }
-        return res;
-    };
-
-    int t;
-    int64_t u, v, l, r;
-    cin >> t;
-    while (t--) {
-        cin >> l >> r;
-        u = findSe(l);
-        v = findFi(r);
-        cout << v - u + 1 << '\n';
-    }
+    Node *head = nullptr;
+    addLast(head, 50);
+    addLast(head, 10);
+    addLast(head, 20);
+    addLast(head, 40);
+    addLast(head, 30);
+    addLast(head, 11);
+    mergeSort(head);
+    output(head);
+    // cout << findMaxBelow(head, 11) << '\n';
+    // cout << findMinAbove(head, 11) << '\n';
 }

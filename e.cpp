@@ -1,84 +1,158 @@
 #include "bits/stdc++.h"
 
 using namespace std;
-const int maxn = 1e6 + 9;
-int n, m;
-pair<int, int> a[maxn], b[109];
+struct Node {
+    int value;
+    Node *left;
+    Node *right;
+};
 
-inline auto operator-(const pair<int, int> &a, const pair<int, int> &b) -> pair<int, int> {
-    return pair<int, int>(b.first - a.first, b.second - a.second);
+Node *createNode(int x) {
+    Node *p = new Node;
+    p->value = x;
+    p->left = p->right = nullptr;
+    return p;
 }
 
-inline auto operator*(const pair<int, int> &u, const pair<int, int> &v) -> int64_t {
-    return (int64_t) u.first * v.first + (int64_t) u.second * v.second;
-}
-
-inline auto operator^(const pair<int, int> &u, const pair<int, int> &v) -> int64_t {
-    return (int64_t) u.first * v.second - (int64_t) v.first * u.second;
-}
-
-inline auto pointOnSegment(const pair<int, int> &a, const pair<int, int> &b, const pair<int, int> &c) -> bool {
-    pair<int, int> ab = b - a, ac = c - a;
-    return (ab ^ ac) == 0 && (ab * ac) <= 0;
-}
-
-inline auto pointOnRay(const pair<int, int> &a, const pair<int, int> &x, const pair<int, int> &b) -> bool {
-    pair<int, int> ax = x - a, ab = b - a;
-    return (ax ^ ab) == 0 && (ax * ab) >= 0;
-}
-
-inline auto rayCutSegment(const pair<int, int> &a, const pair<int, int> &x, const pair<int, int> &b, const pair<int, int> &c) -> bool {
-    pair<int, int> ax = x - a, xb = b - x, xc = c - x;
-    int64_t axb = ax ^ xb, axc = ax ^ xc;
-    if ((axb <= 0 && axc <= 0) || (axb >= 0 && axc >= 0)) {
-        return 0;
+void insertNode(Node *&root, int k) {
+    if (root == nullptr) {
+        root = createNode(k);
     }
-    int64_t S1 = (b - a) ^ (c - a), S2 = xb ^ xc;
-    if ((S1 <= 0 && S2 <= 0) || (S1 >= 0 && S2 >= 0)) {
-        return abs(S2) < abs(S1);
+    else if (root->value > k) {
+        insertNode(root->left, k);
     }
-    return 1;
+    else {
+        insertNode(root->right, k);
+    }
 }
 
-inline auto check(const pair<int, int> &x) -> bool {
-    for (int i = 1; i <= n; ++i) {
-        if (pointOnSegment(x, a[i - 1], a[i])) {
-            return 1;
+Node *findNode(Node *root, int k) {
+    if (root == nullptr || root->value == k) {
+        return root;
+    }
+    else if (root->value > k) {
+        return findNode(root->left, k);
+    }
+    else {
+        return findNode(root->right, k);
+    }
+}
+
+Node *findValue(Node *root, int k) {
+    Node *p = root;
+    while (p != nullptr && p->value != k) {
+        if (p->value > k) {
+            p = p->left;
+        }
+        else {
+            p = p->right;
         }
     }
-    pair<int, int> y = pair<int, int>(x.first, 1e9 + 1);
-    while (1) {
-        bool ok = true;
-        for (int i = 1; i <= n; ++i) {
-            if (pointOnRay(x, y, a[i])) {
-                ok = false;
-                break;
-            }
-        }
-        if (ok) {
-            break;
-        }
-        y = pair<int, int>(rand() % int(1e8), rand() % int(1e8));
+    return p;
+}
+
+Node *findMaxBelow(Node *root, int k) {
+    if (root == nullptr) {
+        return nullptr;
     }
-    int cnt = {};
-    for (int i = 1; i <= n; ++i) {
-        cnt += rayCutSegment(x, y, a[i - 1], a[i]);
+    if (root->value > k) {
+        return findMaxBelow(root->left, k);
     }
-    return cnt & 1;
+    Node *tmp = findMaxBelow(root->right, k);
+    if (tmp != nullptr) {
+        return tmp;
+    }
+    if (root->value < k) {
+        return root;
+    }
+    return findMaxBelow(root->left, k);
+}
+
+Node *findMinAbove(Node *root, int k) {
+    if (root == nullptr) {
+        return nullptr;
+    }
+    if (root->value < k) {
+        return findMinAbove(root->right, k);
+    }
+    Node *tmp = findMinAbove(root->left, k);
+    if (tmp != nullptr) {
+        return tmp;
+    }
+    if (root->value > k) {
+        return root;
+    }
+    return findMinAbove(root->right, k);
+}
+
+Node *findMaxEvenX(Node *root, int x) {
+    if (root == nullptr) {
+        return nullptr;
+    }
+    if (root->value > x) {
+        return findMaxEvenX(root->left, x);
+    }
+    Node *tmp = findMaxEvenX(root->right, x);
+    if (tmp != nullptr) {
+        return tmp;
+    }
+    if (root->value <= x && root->value % 2 == 0) {
+        return root;
+    }
+    return findMaxEvenX(root->left, x);
+}
+
+bool validBST(Node *root, int left, int right) {
+    if (root == nullptr) {
+        return true;
+    }
+    if (root->value > left && root->value < right) {
+        return validBST(root->left, left, root->value) && validBST(root->right, root->value, right);
+    }
+    return false;
+}
+
+bool checkBST(Node *root) {
+    return validBST(root, 1 << 31, ~(1 << 31));
+}
+
+bool isSubTree(Node *root, int keyRoot, int keyLeft, int keyRight) {
+    if (root == nullptr) {
+        return false;
+    }
+    if (root->left != nullptr && root->right != nullptr && root->value == keyRoot &&
+        root->left->value == keyLeft && root->right->value == keyRight) {
+        return true;
+    }
+    return isSubTree(root->left, keyRoot, keyLeft, keyRight) || isSubTree(root->right, keyRoot, keyLeft, keyRight);
+}
+
+bool checkSubTree(Node *root, Node *subRoot) {
+    if (root == nullptr && subRoot == nullptr) {
+        return true;
+    }
+    if (root == nullptr || subRoot == nullptr) {
+        return false;
+    }
+    if (root->value != subRoot->value) {
+        return false;
+    }
+    return checkSubTree(root->left, subRoot->left) && checkSubTree(root->right, subRoot->right);
+}
+
+bool IsSubTree(Node *root, Node *subRoot) {
+    if (checkSubTree(root, subRoot)) {
+        return true;
+    }
+    if (root == nullptr) {
+        return false;
+    }
+    return IsSubTree(root->left, subRoot) || IsSubTree(root->right, subRoot);
 }
 
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    srand(time(nullptr));
-    cin >> n >> m;
-    for (int i = 1; i <= n; ++i) {
-        cin >> a[i].first >> a[i].second;
-    }
-    a[0] = a[n];
-    for (int i = 1; i <= m; ++i) {
-        cin >> b[i].first >> b[i].second;
-        cout << (check(b[i]) ? "YES" : "NO") << '\n';
-    }
+    cout << LONG_MIN << '\n';
 }
